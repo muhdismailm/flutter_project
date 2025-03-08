@@ -1,0 +1,29 @@
+name: login_1
+description: A new Flutter project.
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=2.12.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_native_splash: ^2.4.4
+
+  # Add other dependencies here
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter_native_splash:
+  color: '#f7f6f1'
+  color_dark: '#272727'
+  image: assets/images/worker.png
+  image_dark: assets/images/worker.png
+
+flutter:
+  assets:
+    - assets/images/worker.png
+    
