@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:login_1/main.dart';
+import 'signup_form.dart';
 class LoginForm extends StatefulWidget {
   const LoginForm({Key? key}) : super(key: key);
 
@@ -9,6 +11,8 @@ class LoginForm extends StatefulWidget {
 }
 
 class _LoginFormState extends State<LoginForm> {
+
+   final _auth = FirebaseAuth.instance;
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
@@ -93,6 +97,23 @@ class _LoginFormState extends State<LoginForm> {
                       ),
                       const SizedBox(height: 20),
                       TextFormField(
+                        controller: _passwordController,
+                        decoration: InputDecoration(
+                          labelText: 'Password',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                        ),
+                        obscureText: true,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter your password';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 20),
+                      TextFormField(
                         controller: _phoneController,
                         decoration: InputDecoration(
                           labelText: 'Phone Number',
@@ -115,32 +136,8 @@ class _LoginFormState extends State<LoginForm> {
                         },
                       ),
                       const SizedBox(height: 20),
-                      TextFormField(
-                        controller: _passwordController,
-                        decoration: InputDecoration(
-                          labelText: 'Password',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10.0),
-                          ),
-                        ),
-                        obscureText: true,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter your password';
-                          }
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: 20),
                       ElevatedButton(
-                        onPressed: () {
-                          if (_formKey.currentState!.validate()) {
-                            // Process the login information
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Processing Data')),
-                            );
-                          }
-                        },
+                        onPressed: _login,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.blue, // Background color
                           foregroundColor: Colors.white, // Text color
@@ -152,6 +149,16 @@ class _LoginFormState extends State<LoginForm> {
                         ),
                         child: const Text('Login'),
                       ),
+                      const SizedBox(height: 20),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const SignUpForm()),
+                          );
+                        },
+                        child: const Text('Don\'t have an account? Sign Up'),
+                      ),
                     ],
                   ),
                 ),
@@ -162,4 +169,23 @@ class _LoginFormState extends State<LoginForm> {
       ),
     );
   }
+  _login() async {
+  try {
+    final UserCredential user = await _auth.createUserWithEmailAndPassword(
+      email: _emailController.text,  
+      password: _passwordController.text,  
+    );
+
+    if (user.user != null) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const WelcomeScreen()),
+      );
+    }
+  } catch (e) {
+    print("Error: $e");
+  }
+}
+
+
 }

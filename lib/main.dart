@@ -1,8 +1,15 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:login_1/src/features/authentication/screens/login/login_form.dart';
-// Correct import statement
+import 'package:login_1/src/features/authentication/screens/login/signup_form.dart';
+import 'firebase_options.dart'; // Import the generated file for Firebase options
 
-void main() => runApp(const App());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  runApp(const App());
+}
 
 class App extends StatelessWidget {
   const App({Key? key}) : super(key: key);
@@ -40,11 +47,11 @@ class WelcomeScreen extends StatelessWidget {
         padding: const EdgeInsets.all(20.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children:[
+          children: [
             Align(
               alignment: Alignment.centerRight,
               child: Image.asset('assets/images/plumber.png'), // Add your logo here
-            ), // Add your logo here
+            ),
             const SizedBox(height: 20),
             const Text(
               'Welcome to workify!',
@@ -61,32 +68,37 @@ class WelcomeScreen extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context){
+                  MaterialPageRoute(builder: (context) {
                     return const LoginForm();
-                  })
+                  }),
                 );
               },
               style: ElevatedButton.styleFrom(
-                  backgroundColor:  Colors.blue, // Background color
-                   foregroundColor: Colors.white, // Text color
-                  padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 20),
-                  textStyle: const TextStyle(fontSize: 16),
-                ),
+                backgroundColor: Colors.blue, // Background color
+                foregroundColor: Colors.white, // Text color
+                padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 20),
+                textStyle: const TextStyle(fontSize: 16),
+              ),
               child: const Text('Login'),
             ),
             const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {
-                  // Navigate to signup screen
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.redAccent, // Background color
-                   foregroundColor: Colors.white, // Text color
-                  padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 20),
-                  textStyle: const TextStyle(fontSize: 16),
-                ),
-                child: const Text('Sign Up'),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) {
+                    return const SignUpForm();
+                  }),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.redAccent, // Background color
+                foregroundColor: Colors.white, // Text color
+                padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 20),
+                textStyle: const TextStyle(fontSize: 16),
               ),
+              child: const Text('Sign Up'),
+            ),
           ],
         ),
       ),
@@ -113,7 +125,7 @@ class AppHome extends StatelessWidget {
       ),
       body: const Padding(
         padding: EdgeInsets.all(20.0),
-
+        child: LoginForm(),
       ),
     );
   }
