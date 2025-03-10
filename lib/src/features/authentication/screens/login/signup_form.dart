@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:login_1/src/features/authentication/screens/login/auth_service.dart';
+import 'login_form.dart'; // Import the login form
 
 class SignUpForm extends StatefulWidget {
   const SignUpForm({Key? key}) : super(key: key);
@@ -10,8 +11,7 @@ class SignUpForm extends StatefulWidget {
 }
 
 class _SignUpFormState extends State<SignUpForm> {
-
-  final _auth =AuthService();
+  final _auth = AuthService();
 
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
@@ -167,9 +167,7 @@ class _SignUpFormState extends State<SignUpForm> {
 
   void _signup() async {
     if (_formKey.currentState!.validate()) {
-    
       final email = _emailController.text;
-    
       final password = _passwordController.text;
       final confirmPassword = _confirmPasswordController.text;
 
@@ -178,6 +176,10 @@ class _SignUpFormState extends State<SignUpForm> {
         if (user != null) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('User created successfully')),
+          );
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const LoginForm()),
           );
         } else {
           ScaffoldMessenger.of(context).showSnackBar(

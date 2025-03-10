@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:login_1/main.dart';
+import 'package:login_1/src/features/authentication/screens/home_screen.dart';
 import 'signup_form.dart';
 class LoginForm extends StatefulWidget {
   const LoginForm({Key? key}) : super(key: key);
@@ -170,22 +171,28 @@ class _LoginFormState extends State<LoginForm> {
     );
   }
   _login() async {
-  try {
-    final UserCredential user = await _auth.createUserWithEmailAndPassword(
-      email: _emailController.text,  
-      password: _passwordController.text,  
-    );
+  if (_formKey.currentState!.validate()) {
+    try {
+      final UserCredential user = await _auth.signInWithEmailAndPassword(
+        email: _emailController.text,
+        password: _passwordController.text,
+      );
 
-    if (user.user != null) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const WelcomeScreen()),
+      if (user.user != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Logged successfully')),
+        );
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const HomeScreen()),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Login failed: $e')),
       );
     }
-  } catch (e) {
-    print("Error: $e");
   }
 }
-
 
 }
