@@ -26,4 +26,5 @@ flutter_native_splash:
 flutter:
   assets:
     - assets/images/worker.png
+    - assets/images/plumber.png
     

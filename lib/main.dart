@@ -40,8 +40,11 @@ class WelcomeScreen extends StatelessWidget {
         padding: const EdgeInsets.all(20.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Image.asset('assets/images/worker.png'), // Add your logo here
+          children:[
+            Align(
+              alignment: Alignment.centerRight,
+              child: Image.asset('assets/images/plumber.png'), // Add your logo here
+            ), // Add your logo here
             const SizedBox(height: 20),
             const Text(
               'Welcome to workify!',
@@ -63,15 +66,27 @@ class WelcomeScreen extends StatelessWidget {
                   })
                 );
               },
+              style: ElevatedButton.styleFrom(
+                  backgroundColor:  Colors.blue, // Background color
+                   foregroundColor: Colors.white, // Text color
+                  padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 20),
+                  textStyle: const TextStyle(fontSize: 16),
+                ),
               child: const Text('Login'),
             ),
             const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                
-              },
-              child: const Text('Sign Up'),
-            ),
+              ElevatedButton(
+                onPressed: () {
+                  // Navigate to signup screen
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.redAccent, // Background color
+                   foregroundColor: Colors.white, // Text color
+                  padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 20),
+                  textStyle: const TextStyle(fontSize: 16),
+                ),
+                child: const Text('Sign Up'),
+              ),
           ],
         ),
       ),
