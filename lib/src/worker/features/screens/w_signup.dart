@@ -1,8 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
 import 'w_login.dart'; // Import the login form
+import 'package:login_1/src/worker/features/screens/widgets/w_appbar.dart';
 
 class w_SignUpForm extends StatefulWidget {
   const w_SignUpForm({Key? key}) : super(key: key);
@@ -34,9 +35,7 @@ class _SignUpFormState extends State<w_SignUpForm> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Sign Up Form'),
-      ),
+      appBar: const WAppbar(title: 'signup'),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Form(
@@ -148,7 +147,7 @@ class _SignUpFormState extends State<w_SignUpForm> {
                 child: ElevatedButton(
                   onPressed: _signup,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue, // Background color
+                    backgroundColor: Colors.amberAccent, // Background color
                     foregroundColor: Colors.white, // Text color
                     padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 20),
                     textStyle: const TextStyle(fontSize: 16),
@@ -182,6 +181,12 @@ class _SignUpFormState extends State<w_SignUpForm> {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text('User created successfully')),
             );
+            CollectionReference workers = FirebaseFirestore.instance.collection('worker');
+            workers.add({
+              'name': _nameController.text,
+              'email': _emailController.text,
+              'phone': _phoneController.text,
+            });
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (context) => const WLogin()),

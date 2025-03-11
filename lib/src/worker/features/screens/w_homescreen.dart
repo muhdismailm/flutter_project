@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:login_1/src/worker/features/screens/widgets/w_appbar.dart';
 
 class W_Homescreen extends StatefulWidget {
   const W_Homescreen({Key? key}) : super(key: key);
@@ -12,17 +13,8 @@ class _WHomescreenState extends State<W_Homescreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.blue,
-        title: const Text(
-          "WORKIFY",
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
+    return  Scaffold(
+      appBar: const WAppbar(title: 'Home'),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

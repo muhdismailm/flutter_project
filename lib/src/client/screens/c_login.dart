@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:login_1/src/worker/features/screens/w_homescreen.dart';
 import 'package:login_1/src/client/screens/c_signup.dart';
+import 'package:login_1/src/client/widgets/custom_appbar.dart';
 
 
 class CLogin extends StatefulWidget {
@@ -33,15 +34,7 @@ class _LoginFormState extends State<CLogin> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.blue,
-        title: const Text(
-          "WORKIFY",
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-          ),
-        )),
+      appBar: const CustomAppBar(title: 'Home'),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(20.0),

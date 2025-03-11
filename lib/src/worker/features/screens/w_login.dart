@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:login_1/src/worker/features/screens/w_homescreen.dart';
 import 'package:login_1/src/worker/features/screens/w_signup.dart';
+import 'package:login_1/src/worker/features/screens/widgets/w_appbar.dart';
 
 
 
@@ -33,16 +34,8 @@ class _LoginFormState extends State<WLogin> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.blue,
-        title: const Text(
-          "WORKIFY",
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-          ),
-        )),
+    return  Scaffold(
+      appBar: const WAppbar(title: 'login'),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(20.0),
@@ -142,7 +135,7 @@ class _LoginFormState extends State<WLogin> {
                       ElevatedButton(
                         onPressed: _login,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blue, // Background color
+                          backgroundColor: Colors.amberAccent, // Background color
                           foregroundColor: Colors.white, // Text color
                           padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 20),
                           textStyle: const TextStyle(fontSize: 16),
