@@ -1,9 +1,10 @@
-import 'package:firebase_auth/firebase_auth.dart';
+// import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:login_1/src/features/authentication/screens/login/login_form.dart';
-import 'package:login_1/src/features/authentication/screens/login/signup_form.dart';
-import 'firebase_options.dart'; // Import the generated file for Firebase options
+import 'package:login_1/src/client/screens/c_login.dart';
+// import 'package:login_1/src/client/features/authentication/screens/login/c_signup.dart';
+import 'package:login_1/src/worker/features/screens/w_login.dart'; // Import the w_login page
+// import 'firebase_options.dart'; // Import the generated file for Firebase options
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -50,7 +51,7 @@ class WelcomeScreen extends StatelessWidget {
           children: [
             Align(
               alignment: Alignment.centerRight,
-              child: Image.asset('assets/images/plumber.png'), // Add your logo here
+              child: Image.asset('assets/images/worker.png'), // Add your logo here
             ),
             const SizedBox(height: 20),
             const Text(
@@ -69,7 +70,7 @@ class WelcomeScreen extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) {
-                    return const LoginForm();
+                    return const CLogin();
                   }),
                 );
               },
@@ -79,7 +80,7 @@ class WelcomeScreen extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 20),
                 textStyle: const TextStyle(fontSize: 16),
               ),
-              child: const Text('Login'),
+              child: const Text('CLIENT'),
             ),
             const SizedBox(height: 20),
             ElevatedButton(
@@ -87,17 +88,17 @@ class WelcomeScreen extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) {
-                    return const SignUpForm();
+                    return const WLogin();
                   }),
                 );
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.redAccent, // Background color
+                backgroundColor: Colors.amber, // Background color
                 foregroundColor: Colors.white, // Text color
                 padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 20),
                 textStyle: const TextStyle(fontSize: 16),
               ),
-              child: const Text('Sign Up'),
+              child: const Text('WORKER'),
             ),
           ],
         ),
@@ -125,7 +126,7 @@ class AppHome extends StatelessWidget {
       ),
       body: const Padding(
         padding: EdgeInsets.all(20.0),
-        child: LoginForm(),
+       
       ),
     );
   }

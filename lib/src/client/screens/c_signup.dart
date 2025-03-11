@@ -1,17 +1,20 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:login_1/src/features/authentication/screens/login/auth_service.dart';
-import 'login_form.dart'; // Import the login form
+import 'package:login_1/src/client/screens/c_login.dart';
+import 'package:login_1/src/client/screens/c_auth_service.dart';
+// Import the login form
 
-class SignUpForm extends StatefulWidget {
-  const SignUpForm({Key? key}) : super(key: key);
+class CSignup extends StatefulWidget {
+  const CSignup({Key? key}) : super(key: key);
 
   @override
   _SignUpFormState createState() => _SignUpFormState();
 }
 
-class _SignUpFormState extends State<SignUpForm> {
-  final _auth = AuthService();
+class _SignUpFormState extends State<CSignup> {
+    final _auth = AuthService1();
 
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
@@ -179,7 +182,7 @@ class _SignUpFormState extends State<SignUpForm> {
           );
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => const LoginForm()),
+            MaterialPageRoute(builder: (context) => const CLogin()),
           );
         } else {
           ScaffoldMessenger.of(context).showSnackBar(

@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:login_1/main.dart';
-import 'package:login_1/src/features/authentication/screens/home_screen.dart';
-import 'signup_form.dart';
-class LoginForm extends StatefulWidget {
-  const LoginForm({Key? key}) : super(key: key);
+import 'package:login_1/src/worker/features/screens/w_homescreen.dart';
+import 'package:login_1/src/worker/features/screens/w_signup.dart';
+
+
+
+class WLogin extends StatefulWidget {
+  const WLogin({Key? key}) : super(key: key);
 
   @override
   _LoginFormState createState() => _LoginFormState();
 }
 
-class _LoginFormState extends State<LoginForm> {
+class _LoginFormState extends State<WLogin> {
 
    final _auth = FirebaseAuth.instance;
   final _formKey = GlobalKey<FormState>();
@@ -58,7 +60,7 @@ class _LoginFormState extends State<LoginForm> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       const Text(
-                        'Login',
+                        'Login as worker',
                         style: TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
@@ -155,7 +157,7 @@ class _LoginFormState extends State<LoginForm> {
                         onPressed: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => const SignUpForm()),
+                            MaterialPageRoute(builder: (context) => const w_SignUpForm()),
                           );
                         },
                         child: const Text('Don\'t have an account? Sign Up'),
@@ -184,7 +186,7 @@ class _LoginFormState extends State<LoginForm> {
         );
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => const HomeScreen()),
+          MaterialPageRoute(builder: (context) => const W_Homescreen()),
         );
       }
     } catch (e) {
