@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:login_1/src/worker/features/screens/w_homescreen.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:login_1/src/client/screens/c_signup.dart';
 import 'package:login_1/src/client/widgets/custom_appbar.dart';
-
+import 'package:login_1/src/client/screens/c_homescreen.dart';
 
 class CLogin extends StatefulWidget {
   const CLogin({Key? key}) : super(key: key);
@@ -14,19 +14,15 @@ class CLogin extends StatefulWidget {
 }
 
 class _LoginFormState extends State<CLogin> {
-
-   final _auth = FirebaseAuth.instance;
+  final _auth = FirebaseAuth.instance;
+  final _firestore = FirebaseFirestore.instance;
   final _formKey = GlobalKey<FormState>();
-  final _nameController = TextEditingController();
   final _emailController = TextEditingController();
-  final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
 
   @override
   void dispose() {
-    _nameController.dispose();
     _emailController.dispose();
-    _phoneController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
@@ -34,7 +30,7 @@ class _LoginFormState extends State<CLogin> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const CustomAppBar(title: 'Home'),
+      appBar: const CustomAppBar(title: 'Client Login'),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(20.0),
@@ -57,22 +53,6 @@ class _LoginFormState extends State<CLogin> {
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
                         ),
-                      ),
-                      const SizedBox(height: 20),
-                      TextFormField(
-                        controller: _nameController,
-                        decoration: InputDecoration(
-                          labelText: 'Name',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10.0),
-                          ),
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter your name';
-                          }
-                          return null;
-                        },
                       ),
                       const SizedBox(height: 20),
                       TextFormField(
@@ -108,29 +88,6 @@ class _LoginFormState extends State<CLogin> {
                         },
                       ),
                       const SizedBox(height: 20),
-                      TextFormField(
-                        controller: _phoneController,
-                        decoration: InputDecoration(
-                          labelText: 'Phone Number',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10.0),
-                          ),
-                        ),
-                        keyboardType: TextInputType.number,
-                        inputFormatters: [
-                          FilteringTextInputFormatter.digitsOnly,
-                          LengthLimitingTextInputFormatter(10),
-                        ],
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter your phone number';
-                          } else if (value.length != 10) {
-                            return 'Phone number must be 10 digits';
-                          }
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: 20),
                       ElevatedButton(
                         onPressed: _login,
                         style: ElevatedButton.styleFrom(
@@ -149,7 +106,7 @@ class _LoginFormState extends State<CLogin> {
                         onPressed: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => const CSignup()),
+                            MaterialPageRoute(builder: (context) => const CSignUpForm()),
                           );
                         },
                         child: const Text('Don\'t have an account? Sign Up'),
@@ -164,29 +121,37 @@ class _LoginFormState extends State<CLogin> {
       ),
     );
   }
-  _login() async {
-  if (_formKey.currentState!.validate()) {
-    try {
-      final UserCredential user = await _auth.signInWithEmailAndPassword(
-        email: _emailController.text,
-        password: _passwordController.text,
-      );
 
-      if (user.user != null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Logged successfully')),
+  void _login() async {
+    if (_formKey.currentState!.validate()) {
+      try {
+        final UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+          email: _emailController.text,
+          password: _passwordController.text,
         );
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const W_Homescreen()),
+
+        if (userCredential.user != null) {
+          final userDoc = await _firestore.collection('users').doc(userCredential.user!.uid).get();
+          if (userDoc.exists && userDoc['role'] == 'client') {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Logged in successfully')),
+            );
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const CHomescreen()),
+            );
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('You are not authorized to login as a client')),
+            );
+            await _auth.signOut();
+          }
+        }
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Login failed: $e')),
         );
       }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Login failed: $e')),
-      );
     }
   }
-}
-
 }

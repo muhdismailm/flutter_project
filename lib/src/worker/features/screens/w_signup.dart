@@ -5,14 +5,14 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'w_login.dart'; // Import the login form
 import 'package:login_1/src/worker/features/screens/widgets/w_appbar.dart';
 
-class w_SignUpForm extends StatefulWidget {
-  const w_SignUpForm({Key? key}) : super(key: key);
+class WSignUpForm extends StatefulWidget {
+  const WSignUpForm({Key? key}) : super(key: key);
 
   @override
   _SignUpFormState createState() => _SignUpFormState();
 }
 
-class _SignUpFormState extends State<w_SignUpForm> {
+class _SignUpFormState extends State<WSignUpForm> {
   final _auth = FirebaseAuth.instance;
 
   final _formKey = GlobalKey<FormState>();
@@ -35,7 +35,7 @@ class _SignUpFormState extends State<w_SignUpForm> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const WAppbar(title: 'signup'),
+      appBar: const WAppbar(title: 'Worker Sign Up'),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Form(
@@ -165,7 +165,7 @@ class _SignUpFormState extends State<w_SignUpForm> {
     );
   }
 
-   void _signup() async {
+  void _signup() async {
     if (_formKey.currentState!.validate()) {
       final email = _emailController.text;
       final password = _passwordController.text;
@@ -178,15 +178,15 @@ class _SignUpFormState extends State<w_SignUpForm> {
             password: password,
           );
           if (userCredential.user != null) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('User created successfully')),
-            );
-            CollectionReference workers = FirebaseFirestore.instance.collection('worker');
-            workers.add({
+            await FirebaseFirestore.instance.collection('worker').doc(userCredential.user!.uid).set({
               'name': _nameController.text,
               'email': _emailController.text,
               'phone': _phoneController.text,
+              'role': 'worker', // Add the role field
             });
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('User created successfully')),
+            );
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (context) => const WLogin()),
@@ -201,5 +201,7 @@ class _SignUpFormState extends State<w_SignUpForm> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Passwords do not match')),
         );
-      }}}
+      }
+    }
+  }
 }

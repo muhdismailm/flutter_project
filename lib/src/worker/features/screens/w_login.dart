@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:login_1/src/worker/features/screens/w_homescreen.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:login_1/src/worker/features/screens/w_signup.dart';
 import 'package:login_1/src/worker/features/screens/widgets/w_appbar.dart';
-
-
+import 'package:login_1/src/worker/features/screens/pages/page1.dart';
 
 class WLogin extends StatefulWidget {
   const WLogin({Key? key}) : super(key: key);
@@ -15,27 +14,23 @@ class WLogin extends StatefulWidget {
 }
 
 class _LoginFormState extends State<WLogin> {
-
    final _auth = FirebaseAuth.instance;
+final _firestore = FirebaseFirestore.instance;
   final _formKey = GlobalKey<FormState>();
-  final _nameController = TextEditingController();
-  final _emailController = TextEditingController();
-  final _phoneController = TextEditingController();
-  final _passwordController = TextEditingController();
+    final _emailController = TextEditingController();
+    final _passwordController = TextEditingController();
 
   @override
   void dispose() {
-    _nameController.dispose();
-    _emailController.dispose();
-    _phoneController.dispose();
-    _passwordController.dispose();
+        _emailController.dispose();
+        _passwordController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return  Scaffold(
-      appBar: const WAppbar(title: 'login'),
+    return Scaffold(
+      appBar: const WAppbar(title: 'Worker Login'),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(20.0),
@@ -59,23 +54,7 @@ class _LoginFormState extends State<WLogin> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      const SizedBox(height: 20),
-                      TextFormField(
-                        controller: _nameController,
-                        decoration: InputDecoration(
-                          labelText: 'Name',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10.0),
-                          ),
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter your name';
-                          }
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: 20),
+                                            const SizedBox(height: 20),
                       TextFormField(
                         controller: _emailController,
                         decoration: InputDecoration(
@@ -108,34 +87,11 @@ class _LoginFormState extends State<WLogin> {
                           return null;
                         },
                       ),
-                      const SizedBox(height: 20),
-                      TextFormField(
-                        controller: _phoneController,
-                        decoration: InputDecoration(
-                          labelText: 'Phone Number',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10.0),
-                          ),
-                        ),
-                        keyboardType: TextInputType.number,
-                        inputFormatters: [
-                          FilteringTextInputFormatter.digitsOnly,
-                          LengthLimitingTextInputFormatter(10),
-                        ],
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter your phone number';
-                          } else if (value.length != 10) {
-                            return 'Phone number must be 10 digits';
-                          }
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: 20),
+                                            const SizedBox(height: 20),
                       ElevatedButton(
                         onPressed: _login,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.amberAccent, // Background color
+                          backgroundColor: Colors.amber, // Background color
                           foregroundColor: Colors.white, // Text color
                           padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 20),
                           textStyle: const TextStyle(fontSize: 16),
@@ -150,7 +106,7 @@ class _LoginFormState extends State<WLogin> {
                         onPressed: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => const w_SignUpForm()),
+                            MaterialPageRoute(builder: (context) => const WSignUpForm()),
                           );
                         },
                         child: const Text('Don\'t have an account? Sign Up'),
@@ -165,22 +121,31 @@ class _LoginFormState extends State<WLogin> {
       ),
     );
   }
-  _login() async {
+
+  void _login() async {
   if (_formKey.currentState!.validate()) {
     try {
-      final UserCredential user = await _auth.signInWithEmailAndPassword(
+      final UserCredential userCredential = await _auth.signInWithEmailAndPassword(
         email: _emailController.text,
         password: _passwordController.text,
       );
 
-      if (user.user != null) {
+      if (userCredential.user != null) {
+final userDoc = await _firestore.collection('users').doc(userCredential.user!.uid).get();
+          if (userDoc.exists && userDoc['role'] == 'worker') {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Logged successfully')),
+          const SnackBar(content: Text('Logged in successfully')),
         );
-        Navigator.push(
+        Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const W_Homescreen()),
+          MaterialPageRoute(builder: (context) => const  HomePage()),
         );
+} else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('You are not authorized to login as a worker')),
+            );
+            await _auth.signOut();
+          }
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -189,5 +154,4 @@ class _LoginFormState extends State<WLogin> {
     }
   }
 }
-
 }

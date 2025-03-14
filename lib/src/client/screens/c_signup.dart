@@ -1,21 +1,19 @@
-// import 'package:firebase_auth/firebase_auth.dart';
-// import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:login_1/src/client/screens/c_login.dart';
-import 'package:login_1/src/client/screens/c_auth_service.dart';
-import 'package:login_1/src/client/widgets/custom_appbar.dart';
-// Import the login form
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'c_login.dart'; // Import the login form
 
-class CSignup extends StatefulWidget {
-  const CSignup({Key? key}) : super(key: key);
+class CSignUpForm extends StatefulWidget {
+  const CSignUpForm({Key? key}) : super(key: key);
 
   @override
   _SignUpFormState createState() => _SignUpFormState();
 }
 
-class _SignUpFormState extends State<CSignup> {
-    final _auth = AuthService1();
+class _SignUpFormState extends State<CSignUpForm> {
+  final _auth = FirebaseAuth.instance;
+  final _firestore = FirebaseFirestore.instance;
 
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
@@ -37,7 +35,9 @@ class _SignUpFormState extends State<CSignup> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const CustomAppBar(title: 'Home'),
+      appBar: AppBar(
+        title: const Text('Client Sign Up'),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Form(
@@ -174,18 +174,29 @@ class _SignUpFormState extends State<CSignup> {
       final confirmPassword = _confirmPasswordController.text;
 
       if (password == confirmPassword) {
-        final user = await _auth.createUserWithEmailAndPassword(email, password);
-        if (user != null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('User created successfully')),
+        try {
+          final userCredential = await _auth.createUserWithEmailAndPassword(
+            email: email,
+            password: password,
           );
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const CLogin()),
-          );
-        } else {
+          if (userCredential.user != null) {
+            await _firestore.collection('users').doc(userCredential.user!.uid).set({
+              'name': _nameController.text,
+              'email': _emailController.text,
+              'phone': _phoneController.text,
+              'role': 'client', // Add the role field
+            });
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('User created successfully')),
+            );
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const CLogin()),
+            );
+          }
+        } catch (e) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('User creation failed')),
+            SnackBar(content: Text('User creation failed: $e')),
           );
         }
       } else {
