@@ -2,10 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:login_1/src/client/screens/c_signup.dart';
+import 'package:login_1/src/client/screens/CPages/c_homescreen.dart';
+import 'package:login_1/src/client/screens/login/c_signup.dart';
 import 'package:login_1/src/client/widgets/custom_appbar.dart';
-import 'package:login_1/src/client/screens/c_homescreen.dart';
-
 class CLogin extends StatefulWidget {
   const CLogin({Key? key}) : super(key: key);
 
@@ -138,7 +137,7 @@ class _LoginFormState extends State<CLogin> {
             );
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => const CHomescreen()),
+              MaterialPageRoute(builder: (context) => const ClientHomePage()),
             );
           } else {
             ScaffoldMessenger.of(context).showSnackBar(

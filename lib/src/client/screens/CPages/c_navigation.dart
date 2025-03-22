@@ -1,22 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:login_1/src/worker/features/screens/login/w_logout.dart';
-import 'package:login_1/src/worker/features/screens/pages/update_profile.dart'; // Import the profile update screen
+import 'package:login_1/src/client/screens/CPages/update_profile.dart'; // Import the client profile update screen
+import 'package:login_1/src/client/screens/login/c_logout.dart'; // Import the client logout screen
 
-class WorkerNavigationDrawer extends StatelessWidget {
+class ClientNavigationDrawer extends StatelessWidget {
   final String? userName;
 
-  const WorkerNavigationDrawer({Key? key, this.userName}) : super(key: key);
+  const ClientNavigationDrawer({Key? key, this.userName}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-
     return Drawer(
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
           DrawerHeader(
             decoration: const BoxDecoration(
-              color: Colors.amber,
+              color: Colors.blue,
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -24,11 +23,11 @@ class WorkerNavigationDrawer extends StatelessWidget {
                 const CircleAvatar(
                   radius: 30,
                   backgroundColor: Colors.white,
-                  child: Icon(Icons.person, size: 40, color: Color.fromARGB(255, 233, 206, 124)),
+                  child: Icon(Icons.person, size: 40, color: Colors.blue),
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  userName ?? 'User', // Display the logged-in user's name
+                  userName ?? 'User', // Display the logged-in client's name
                   style: const TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -36,7 +35,7 @@ class WorkerNavigationDrawer extends StatelessWidget {
                   ),
                 ),
                 const Text(
-                  'Worker',
+                  'Client',
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
@@ -53,7 +52,7 @@ class WorkerNavigationDrawer extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => const UpdateProfile(), // Replace with your profile update screen
+                  builder: (context) => const UpdateProfile(), // Replace with your client profile update screen
                 ),
               );
             },
@@ -65,7 +64,7 @@ class WorkerNavigationDrawer extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => const WorkerLogoutPage(),
+                  builder: (context) => const ClientLogoutPage(), // Replace with your client logout screen
                 ),
               );
             },

@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:login_1/src/worker/features/screens/pages/bookedpage.dart';
-import 'package:login_1/src/worker/features/screens/pages/w_navigation.dart';
-// Import the navigation drawer
+import 'package:login_1/src/client/screens/CPages/bookedservices.dart'; // Import the booked services screen
+import 'package:login_1/src/client/screens/CPages/c_navigation.dart'; // Import the client navigation drawer
 
-class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+class ClientHomePage extends StatefulWidget {
+  const ClientHomePage({Key? key}) : super(key: key);
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<ClientHomePage> createState() => _ClientHomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _ClientHomePageState extends State<ClientHomePage> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>(); // Key to control the drawer
@@ -27,7 +26,7 @@ class _HomePageState extends State<HomePage> {
   Future<void> _getUserData() async {
     User? user = _auth.currentUser;
     if (user != null) {
-      DocumentSnapshot userDoc = await _firestore.collection('worker').doc(user.uid).get();
+      DocumentSnapshot userDoc = await _firestore.collection('users').doc(user.uid).get();
       if (userDoc.exists) {
         setState(() {
           name = userDoc['name'];
@@ -40,16 +39,15 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey, // Assign the key to the Scaffold
-      
-      drawer: WorkerNavigationDrawer(userName: name), // Use the navigation drawer
+     drawer: ClientNavigationDrawer(userName: name), // Use the correct navigation drawer class
       body: SafeArea(
         child: Column(
           children: [
             // Navigation Bar with Welcome Message and Profile Icon
             Container(
-               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 42),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 42),
               decoration: BoxDecoration(
-                color: Colors.amber, // Background color for the navigation bar
+                color: Colors.blue, // Background color for the navigation bar
                 borderRadius: const BorderRadius.only(
                   bottomLeft: Radius.circular(16),
                   bottomRight: Radius.circular(16),
@@ -82,7 +80,7 @@ class _HomePageState extends State<HomePage> {
                             ),
                           ),
                           Text(
-                            name ?? 'User', // Display the logged-in user's name
+                            name ?? 'User', // Display the logged-in client's name
                             style: const TextStyle(
                               fontSize: 24,
                               fontWeight: FontWeight.bold,
@@ -98,7 +96,7 @@ class _HomePageState extends State<HomePage> {
             ),
             const SizedBox(height: 16),
 
-            // Section with Booked Works Button
+            // Section with Booked Services Button
             Container(
               padding: const EdgeInsets.all(16),
               margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -107,6 +105,7 @@ class _HomePageState extends State<HomePage> {
                 borderRadius: BorderRadius.circular(8),
                 boxShadow: [
                   BoxShadow(
+                    // ignore: deprecated_member_use
                     color: Colors.grey.withOpacity(0.2),
                     spreadRadius: 2,
                     blurRadius: 5,
@@ -118,7 +117,7 @@ class _HomePageState extends State<HomePage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text(
-                    'Booked Works',
+                    'Booked Services',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -129,12 +128,12 @@ class _HomePageState extends State<HomePage> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const Bookedpage(), // Replace with your booked works screen
+                          builder: (context) => const BookedServicesPage(), // Replace with your booked services screen
                         ),
                       );
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.amber, // Button background color
+                      backgroundColor: Colors.blue, // Button background color
                       foregroundColor: Colors.white, // Button text color
                       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                     ),
@@ -155,6 +154,7 @@ class _HomePageState extends State<HomePage> {
                   borderRadius: BorderRadius.circular(8),
                   boxShadow: [
                     BoxShadow(
+                      // ignore: deprecated_member_use
                       color: Colors.grey.withOpacity(0.2),
                       spreadRadius: 2,
                       blurRadius: 5,
@@ -199,12 +199,12 @@ class _HomePageState extends State<HomePage> {
                             itemCount: requests.length,
                             itemBuilder: (context, index) {
                               final request = requests[index];
-                              final workName = request['workName'] ?? 'Unknown Work';
+                              final serviceName = request['serviceName'] ?? 'Unknown Service';
                               final place = request['place'] ?? 'Unknown Place';
 
                               return ListTile(
-                                leading: const Icon(Icons.work, color: Colors.amber),
-                                title: Text(workName),
+                                leading: const Icon(Icons.work, color: Colors.blue),
+                                title: Text(serviceName),
                                 subtitle: Text(place),
                                 trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                                 onTap: () {
@@ -225,5 +225,5 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
-
 }
+
