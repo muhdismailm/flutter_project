@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:login_1/src/worker/features/screens/w_signup.dart';
+import 'package:login_1/src/worker/features/screens/login/w_signup.dart';
 import 'package:login_1/src/worker/features/screens/widgets/w_appbar.dart';
-import 'package:login_1/src/worker/features/screens/pages/page1.dart';
+import 'package:login_1/src/worker/features/screens/pages/HomeScreen.dart';
 
 class WLogin extends StatefulWidget {
   const WLogin({Key? key}) : super(key: key);
@@ -131,7 +130,7 @@ final _firestore = FirebaseFirestore.instance;
       );
 
       if (userCredential.user != null) {
-final userDoc = await _firestore.collection('users').doc(userCredential.user!.uid).get();
+final userDoc = await _firestore.collection('worker').doc(userCredential.user!.uid).get();
           if (userDoc.exists && userDoc['role'] == 'worker') {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Logged in successfully')),
