@@ -58,7 +58,7 @@ class ClientNavigationDrawer extends StatelessWidget {
             },
           ),
           ListTile(
-            leading: const Icon(Icons.logout_outlined, color: Colors.grey), // Explicitly set the icon color
+            leading: const Icon(Icons.login_outlined,color: Colors.grey), // Explicitly set the icon color
             title: const Text('Logout'),
             onTap: () {
               Navigator.push(

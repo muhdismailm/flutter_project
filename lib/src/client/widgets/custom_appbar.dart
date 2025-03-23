@@ -9,7 +9,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     return AppBar(
       backgroundColor: Colors.blue,
-      title: Text('workify',
+      title: Text('WORKIFY',
         style: const TextStyle(
           color: Colors.white,
           fontWeight: FontWeight.bold,

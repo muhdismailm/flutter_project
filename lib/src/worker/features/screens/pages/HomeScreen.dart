@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:login_1/src/worker/features/screens/pages/bookedpage.dart';
-import 'package:login_1/src/worker/features/screens/pages/w_navigation.dart';
-// Import the navigation drawer
+import 'package:login_1/src/worker/features/screens/pages/w_navigation.dart'; // Import the navigation drawer
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -17,6 +16,7 @@ class _HomePageState extends State<HomePage> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>(); // Key to control the drawer
   String? name;
+  String? skill; // Add a variable to store the worker's skill
 
   @override
   void initState() {
@@ -30,7 +30,8 @@ class _HomePageState extends State<HomePage> {
       DocumentSnapshot userDoc = await _firestore.collection('worker').doc(user.uid).get();
       if (userDoc.exists) {
         setState(() {
-          name = userDoc['name'];
+          name = userDoc['name']; // Fetch the worker's name
+          skill = userDoc['skill']; // Fetch the worker's skill
         });
       }
     }
@@ -40,14 +41,16 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey, // Assign the key to the Scaffold
-      
-      drawer: WorkerNavigationDrawer(userName: name), // Use the navigation drawer
+      drawer: WorkerNavigationDrawer(
+        userName: name, // Pass the worker's name
+        workerSkill: skill, // Pass the worker's skill
+      ), // Use the navigation drawer
       body: SafeArea(
         child: Column(
           children: [
             // Navigation Bar with Welcome Message and Profile Icon
             Container(
-               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 42),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 42),
               decoration: BoxDecoration(
                 color: Colors.amber, // Background color for the navigation bar
                 borderRadius: const BorderRadius.only(
