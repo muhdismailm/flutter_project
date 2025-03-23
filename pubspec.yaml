@@ -10,6 +10,7 @@ dependencies:
   cloud_firestore: ^5.6.5
   firebase_auth: ^5.5.1
   firebase_core: ^3.12.1
+  firebase_database: ^11.3.4
   flutter:
     sdk: flutter
   flutter_native_splash: ^2.4.4
@@ -30,4 +31,4 @@ flutter:
   assets:
     - assets/images/worker.png
     - assets/images/plumber.png
-    
+

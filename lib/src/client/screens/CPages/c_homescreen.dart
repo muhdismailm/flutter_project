@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:login_1/src/client/screens/CPages/bookedservices.dart'; // Import the booked services screen
+import 'package:login_1/src/client/screens/CPages/request.dart'; // Import the booked services screen
 import 'package:login_1/src/client/screens/CPages/c_navigation.dart'; // Import the client navigation drawer
+import 'package:login_1/src/client/screens/CPages/C_worker_list.dart'; // Import the WorkerList widget
 
 class ClientHomePage extends StatefulWidget {
   const ClientHomePage({Key? key}) : super(key: key);
@@ -219,148 +220,16 @@ class _ClientHomePageState extends State<ClientHomePage> {
             ),
             const SizedBox(height: 16),
             
-// Section with Booked Services Button
-            Container(
-              padding: const EdgeInsets.all(16),
-              margin: const EdgeInsets.symmetric(horizontal: 16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(8),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.2),
-                    spreadRadius: 2,
-                    blurRadius: 5,
-                    offset: const Offset(0, 3), // Shadow position
-                  ),
-                ],
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'My Bookings',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const BookedServicesPage(),
-                        ),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue, // Button background color
-                      foregroundColor: Colors.white, // Button text color
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                    ),
-                    child: const Text('View'),
-                  ),
-                ],
-              ),
-            ),
             const SizedBox(height: 16),
 
             
             // Display workers based on selected skill
             Expanded(
-              child: Container(
-                padding: const EdgeInsets.all(16),
-                margin: const EdgeInsets.symmetric(horizontal: 16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.2),
-                      spreadRadius: 2,
-                      blurRadius: 5,
-                      offset: const Offset(0, 3), // Shadow position
-                    ),
-                  ],
-                ),
-                child: isLoading
-                    ? const Center(child: CircularProgressIndicator())
-                    : selectedSkill == null
-                    ? const Center(
-                        child: Text(
-                          'Please select a skill to view available workers.',
-                          style: TextStyle(fontSize: 16, color: Colors.grey),
-                          textAlign: TextAlign.center,
-                        ),
-                      )
-                    : workers.isEmpty
-                    ? const Center(
-                        child: Text(
-                          'No workers available for the selected skill.',
-                          style: TextStyle(fontSize: 16, color: Colors.grey),
-                        ),
-                      )
-                    : ListView.builder(
-                        itemCount: workers.length,
-                        itemBuilder: (context, index) {
-                          Map<String, dynamic> workerData = workers[index].data() as Map<String, dynamic>;
-                          final workerName = workerData['name']?.toString() ?? 'Unknown Worker';
-                          final workerPlace = workerData['place']?.toString() ?? 'Unknown Place';
-                          final workerExperience = workerData['experience']?.toString() ?? 'Not specified';
-
-                          return Card(
-                            elevation: 2,
-                            margin: const EdgeInsets.only(bottom: 8),
-                            child: ListTile(
-                              leading: CircleAvatar(
-                                backgroundColor: Colors.blue.shade100,
-                                child: const Icon(Icons.person, color: Colors.blue),
-                              ),
-                              title: Text(
-                                workerName,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              subtitle: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const SizedBox(height: 4),
-                                  Row(
-                                    children: [
-                                      const Icon(Icons.location_on, size: 14, color: Colors.grey),
-                                      const SizedBox(width: 4),
-                                      Text(workerPlace),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 2),
-                                  Row(
-                                    children: [
-                                      const Icon(Icons.work, size: 14, color: Colors.grey),
-                                      const SizedBox(width: 4),
-                                      Text('Experience: $workerExperience'),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                              trailing: ElevatedButton(
-                                onPressed: () {
-                                  // Show worker details or booking dialog
-                                  _showWorkerDetails(context, workerData);
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.blue,
-                                  foregroundColor: Colors.white,
-                                ),
-                                child: const Text('Book'),
-                              ),
-                              isThreeLine: true,
-                              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                            ),
-                          );
-                        },
-                      ),
+              child: WorkerList(
+                isLoading: isLoading,
+                selectedSkill: selectedSkill,
+                workers: workers,
+                onBookWorker: _showWorkerDetails,
               ),
             ),
           ],
@@ -380,7 +249,7 @@ class _ClientHomePageState extends State<ClientHomePage> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.book),
-            label: 'Bookings',
+            label: 'My Bookings',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.account_circle),
@@ -432,7 +301,7 @@ class _ClientHomePageState extends State<ClientHomePage> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.blue,
               ),
-              child: const Text('Book Now'),
+              child: const Text('Request Now'),
             ),
           ],
         );

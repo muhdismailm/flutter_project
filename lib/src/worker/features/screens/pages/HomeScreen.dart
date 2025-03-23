@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:login_1/src/worker/features/screens/pages/bookedpage.dart';
 import 'package:login_1/src/worker/features/screens/pages/w_navigation.dart'; // Import the navigation drawer
+import 'package:login_1/src/worker/features/screens/pages/w_requests.dart'; // Import the requests page
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -17,6 +18,7 @@ class _HomePageState extends State<HomePage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>(); // Key to control the drawer
   String? name;
   String? skill; // Add a variable to store the worker's skill
+  int _selectedIndex = 0; // Track the selected index for the bottom navigation bar
 
   @override
   void initState() {
@@ -34,6 +36,29 @@ class _HomePageState extends State<HomePage> {
           skill = userDoc['skill']; // Fetch the worker's skill
         });
       }
+    }
+  }
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+
+    if (index == 0) {
+      // Home
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const HomePage()),
+      );
+    } else if (index == 1) {
+      // Requests
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const WorkerRequestsPage()),
+      );
+    } else if (index == 2) {
+      // Account
+      _scaffoldKey.currentState?.openDrawer(); // Open the navigation drawer
     }
   }
 
@@ -226,7 +251,25 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
       ),
+      bottomNavigationBar: BottomNavigationBar(
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.list),
+            label: 'Requests',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.account_circle),
+            label: 'Account',
+          ),
+        ],
+        currentIndex: _selectedIndex,
+        selectedItemColor: Colors.amber,
+        onTap: _onItemTapped,
+      ),
     );
   }
-
 }
