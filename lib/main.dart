@@ -1,13 +1,10 @@
-// import 'package:firebase_auth/firebase_auth.dart';
-// import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:login_1/src/client/screens/login/c_login.dart';
 import 'package:login_1/src/worker/features/screens/login/w_login.dart';
 
-// import 'package:login_1/src/client/features/authentication/screens/login/c_signup.dart';
-// Import the w_login page
-//  import 'firebase_options.dart'; // Import the generated file for Firebase options
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

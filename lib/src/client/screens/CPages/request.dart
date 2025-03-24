@@ -67,7 +67,7 @@ class BookedServicesPage extends StatelessWidget {
                       Text('Client: ${request['clientName'] ?? 'Unknown Client'}'),
                       Text('Contact: ${request['clientContact'] ?? 'Unknown Contact'}'),
                       Text(
-                        'Status: ${request['status']}', // Display the status
+                        'Status: ${request['status']}',
                         style: TextStyle(
                           color: request['status'] == 'Accepted'
                               ? Colors.green
@@ -77,6 +77,16 @@ class BookedServicesPage extends StatelessWidget {
                       ),
                     ],
                   ),
+                  trailing: ElevatedButton(
+                    onPressed: () {
+                      _rejectRequest(context, request['key']);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
+                      foregroundColor: Colors.white,
+                    ),
+                    child: const Text('Reject'),
+                  ),
                   isThreeLine: true,
                 ),
               );
@@ -85,5 +95,19 @@ class BookedServicesPage extends StatelessWidget {
         },
       ),
     );
+  }
+
+  void _rejectRequest(BuildContext context, String requestKey) async {
+    try {
+      // Delete the request from Firebase
+      await FirebaseDatabase.instance.ref('requests/$requestKey').remove();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Request rejected.')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error rejecting request: $e')),
+      );
+    }
   }
 }
