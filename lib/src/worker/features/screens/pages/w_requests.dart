@@ -10,7 +10,6 @@ class WorkerRequestsPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Client Requests'),
         backgroundColor: Colors.amber,
-        
       ),
       body: StreamBuilder<DatabaseEvent>(
         stream: FirebaseDatabase.instance.ref('requests').onValue,
@@ -47,6 +46,7 @@ class WorkerRequestsPage extends StatelessWidget {
               'clientName': entry.value['clientName'],
               'clientContact': entry.value['clientContact'],
               'timestamp': entry.value['timestamp'],
+              'status': entry.value['status'] ?? 'Pending', // Default to "Pending"
             };
           }).toList();
 
@@ -66,6 +66,15 @@ class WorkerRequestsPage extends StatelessWidget {
                       Text('Skill: ${request['workerSkill'] ?? 'Unknown Skill'}'),
                       Text('Contact: ${request['clientContact'] ?? 'Unknown Contact'}'),
                       Text('Timestamp: ${request['timestamp'] ?? 'Unknown Time'}'),
+                      Text(
+                        'Status: ${request['status']}',
+                        style: TextStyle(
+                          color: request['status'] == 'Accepted'
+                              ? Colors.green
+                              : Colors.orange,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ],
                   ),
                   trailing: ElevatedButton(
