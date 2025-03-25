@@ -36,7 +36,10 @@ class _BookedServicesPageState extends State<BookedServicesPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('My Bookings',style: TextStyle(color:Colors.white),),
+        title: const Text(
+          'My Bookings',
+          style: TextStyle(color: Colors.white),
+        ),
         backgroundColor: Colors.blue,
       ),
       body: StreamBuilder<DatabaseEvent>(
@@ -87,37 +90,64 @@ class _BookedServicesPageState extends State<BookedServicesPage> {
               return Card(
                 elevation: 2,
                 margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                child: ListTile(
-                  leading: const Icon(Icons.person, color: Colors.blue),
-                  title: Text(request['workerName'] ?? 'Unknown Worker'),
-                  subtitle: Column(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      // Worker details
+                      Row(
+                        children: [
+                          const Icon(Icons.person, color: Colors.blue),
+                          const SizedBox(width: 8),
+                          Text(
+                            request['workerName'] ?? 'Unknown Worker',
+                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
                       Text('Skill: ${request['workerSkill'] ?? 'Unknown Skill'}'),
                       Text('Client: ${request['clientName'] ?? 'Unknown Client'}'),
-                      Text('Worker Contact: ${request['workerPhone'] ?? 'Unknown Phone'}'), // Display worker phone
+                      Text('Worker Contact: ${request['workerPhone'] ?? 'Unknown Phone'}'),
                       Text(
                         'Status: ${request['status']}',
                         style: TextStyle(
-                          color: request['status'] == 'Accepted'
-                              ? Colors.green
-                              : Colors.orange,
+                          color: request['status'] == 'Accepted' ? Colors.green : Colors.orange,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
+                      const SizedBox(height: 16),
+
+                      // Buttons (Rate and Reject)
+                      if (request['status'] == 'Accepted')
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            ElevatedButton(
+                              onPressed: () {
+                                _showRatingDialog(context, request['workerName'], request['key']);
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.green,
+                                foregroundColor: Colors.white,
+                              ),
+                              child: const Text('Rate'),
+                            ),
+                            ElevatedButton(
+                              onPressed: () {
+                                _rejectRequest(context, request['key']);
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.red,
+                                foregroundColor: Colors.white,
+                              ),
+                              child: const Text('Reject'),
+                            ),
+                          ],
+                        ),
                     ],
                   ),
-                  trailing: ElevatedButton(
-                    onPressed: () {
-                      _rejectRequest(context, request['key']);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red,
-                      foregroundColor: Colors.white,
-                    ),
-                    child: const Text('Reject'),
-                  ),
-                  isThreeLine: true,
                 ),
               );
             },
@@ -158,5 +188,73 @@ class _BookedServicesPageState extends State<BookedServicesPage> {
         SnackBar(content: Text('Error rejecting request: $e')),
       );
     }
+  }
+
+  void _showRatingDialog(BuildContext context, String workerName, String requestKey) {
+    int? selectedRating; // Variable to store the selected rating
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Rate $workerName'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text('Please select a rating:'),
+              const SizedBox(height: 10),
+              DropdownButtonFormField<int>(
+                value: selectedRating,
+                decoration: const InputDecoration(
+                  labelText: 'Rating',
+                  border: OutlineInputBorder(),
+                ),
+                items: List.generate(5, (index) => index + 1) // Generate numbers 1 to 5
+                    .map((rating) => DropdownMenuItem<int>(
+                          value: rating,
+                          child: Text(rating.toString()),
+                        ))
+                    .toList(),
+                onChanged: (value) {
+                  setState(() {
+                    selectedRating = value;
+                  });
+                },
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                if (selectedRating == null) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Please select a rating before submitting.')),
+                  );
+                  return;
+                }
+
+                // Save the rating to Firebase
+                await FirebaseDatabase.instance.ref('ratings/$requestKey').set({
+                  'workerName': workerName,
+                  'rating': selectedRating,
+                });
+
+                Navigator.of(context).pop();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Rating submitted successfully!')),
+                );
+              },
+              child: const Text('Submit'),
+            ),
+          ],
+        );
+      },
+    );
   }
 }

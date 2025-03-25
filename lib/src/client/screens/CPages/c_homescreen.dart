@@ -39,7 +39,7 @@ class _ClientHomePageState extends State<ClientHomePage> {
       if (user != null) {
         // First try to get from 'clients' collection
         DocumentSnapshot userDoc = await _firestore.collection('clients').doc(user.uid).get();
-        
+
         if (userDoc.exists) {
           Map<String, dynamic> userData = userDoc.data() as Map<String, dynamic>;
           setState(() {
@@ -73,7 +73,7 @@ class _ClientHomePageState extends State<ClientHomePage> {
     setState(() {
       isLoading = true;
     });
-    
+
     try {
       // Try with the correct collection name and field
       QuerySnapshot querySnapshot = await _firestore
@@ -82,14 +82,14 @@ class _ClientHomePageState extends State<ClientHomePage> {
           .get();
 
       print("Found ${querySnapshot.docs.length} workers with skill: $skill");
-      
+
       if (mounted) {
         setState(() {
           workers = querySnapshot.docs;
           isLoading = false;
         });
       }
-      
+
       // Print details of found workers for debugging
       for (var worker in workers) {
         Map<String, dynamic> data = worker.data() as Map<String, dynamic>;
@@ -219,10 +219,7 @@ class _ClientHomePageState extends State<ClientHomePage> {
               ),
             ),
             const SizedBox(height: 16),
-            
-            const SizedBox(height: 16),
 
-            
             // Display workers based on selected skill
             Expanded(
               child: WorkerList(
@@ -235,12 +232,6 @@ class _ClientHomePageState extends State<ClientHomePage> {
           ],
         ),
       ),
-
-
-
-
-
-
       bottomNavigationBar: BottomNavigationBar(
         items: const [
           BottomNavigationBarItem(
@@ -262,7 +253,7 @@ class _ClientHomePageState extends State<ClientHomePage> {
       ),
     );
   }
-  
+
   // Method to show worker details and booking option
   void _showWorkerDetails(BuildContext context, Map<String, dynamic> workerData) {
     showDialog(
