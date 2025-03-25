@@ -137,7 +137,7 @@ final userDoc = await _firestore.collection('worker').doc(userCredential.user!.u
         );
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const  HomePage()),
+          MaterialPageRoute(builder: (context) =>   HomePage(name: userDoc['name'],skill: userDoc['skill'],)),
         );
 } else {
             ScaffoldMessenger.of(context).showSnackBar(

@@ -7,8 +7,9 @@ import 'package:login_1/src/worker/features/screens/pages/w_requests.dart'; // I
 import 'package:firebase_database/firebase_database.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
-
+  const HomePage({Key? key, required this.name, required this.skill}) : super(key: key);
+  final String name;
+  final String skill;
   @override
   State<HomePage> createState() => _HomePageState();
 }
@@ -56,13 +57,13 @@ class _HomePageState extends State<HomePage> {
       // Home
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const HomePage()),
+        MaterialPageRoute(builder: (context) =>  HomePage(name:  widget.name,skill: widget.skill)),
       );
     } else if (index == 1) {
       // Requests
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => const WorkerRequestsPage()),
+        MaterialPageRoute(builder: (context) =>  WorkerRequestsPage(workerName: widget.name,workerSkill: widget.skill,)),
       );
     } else if (index == 2) {
       // Account

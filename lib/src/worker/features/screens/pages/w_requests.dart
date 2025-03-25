@@ -1,11 +1,14 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:login_1/src/worker/features/screens/pages/HomeScreen.dart';
 import 'package:login_1/src/worker/features/screens/pages/w_navigation.dart' hide HomePage;
 
 class WorkerRequestsPage extends StatefulWidget {
-  const WorkerRequestsPage({Key? key}) : super(key: key);
-
+  const WorkerRequestsPage({Key? key, required this.workerSkill, required this.workerName}) : super(key: key);
+final String workerSkill;
+final String workerName;
   @override
   State<WorkerRequestsPage> createState() => _WorkerRequestsPageState();
 }
@@ -18,7 +21,7 @@ class _WorkerRequestsPageState extends State<WorkerRequestsPage> {
       // Navigate to Home
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const HomePage()),
+        MaterialPageRoute(builder: (context) =>  HomePage(name: widget.workerName,skill: widget.workerSkill,)),
       );
     } else if (index == 1) {
       // Stay on "Requests"
@@ -69,6 +72,7 @@ class _WorkerRequestsPageState extends State<WorkerRequestsPage> {
 
           // Convert the map to a list for display
           List<Map<String, dynamic>> requestList = requests.entries.map((entry) {
+            log(entry.toString());
             return {
               'key': entry.key, // Store the unique key for deletion
               'workerName': entry.value['workerName'],
@@ -79,6 +83,12 @@ class _WorkerRequestsPageState extends State<WorkerRequestsPage> {
               'status': entry.value['status'] ?? 'Pending', // Default to "Pending"
             };
           }).toList();
+          requestList.removeWhere((element) {
+            if(element['workerSkill']==widget.workerSkill && element['workerName']==widget.workerName){
+              return false;
+            }
+            return true;
+          } ,);
 
           return ListView.builder(
             itemCount: requestList.length,
