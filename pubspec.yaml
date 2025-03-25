@@ -35,4 +35,5 @@ flutter:
   assets:
     - assets/images/worker.png
     - assets/images/plumber.png
+  uses-material-design: true
 
