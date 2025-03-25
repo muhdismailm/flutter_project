@@ -1,14 +1,42 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:login_1/src/client/screens/CPages/c_homescreen.dart'; // Import the home screen
 
-class BookedServicesPage extends StatelessWidget {
+class BookedServicesPage extends StatefulWidget {
   const BookedServicesPage({Key? key}) : super(key: key);
+
+  @override
+  State<BookedServicesPage> createState() => _BookedServicesPageState();
+}
+
+class _BookedServicesPageState extends State<BookedServicesPage> {
+  int _selectedIndex = 1; // Set "My Bookings" as the default selected tab
+
+  void _onItemTapped(int index) {
+    if (index == 0) {
+      // Navigate to Home
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const ClientHomePage()),
+      );
+    } else if (index == 1) {
+      // Stay on "My Bookings"
+    } else if (index == 2) {
+      // Placeholder for Account page
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Account page is under construction.')),
+      );
+    }
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Worker Requests'),
+        title: const Text('My Bookings',style: TextStyle(color:Colors.white),),
         backgroundColor: Colors.blue,
       ),
       body: StreamBuilder<DatabaseEvent>(
@@ -43,8 +71,10 @@ class BookedServicesPage extends StatelessWidget {
               'key': entry.key, // Store the unique key for updating the status
               'workerName': entry.value['workerName'],
               'workerSkill': entry.value['workerSkill'],
+              'workerPhone': entry.value['workerPhone'], // Worker phone number
               'clientName': entry.value['clientName'],
-              'clientContact': entry.value['clientContact'],
+              'clientContact': entry.value['clientContact'], // Client phone number
+              'clientEmail': entry.value['clientEmail'], // Client email
               'timestamp': entry.value['timestamp'],
               'status': entry.value['status'] ?? 'Pending', // Default to "Pending"
             };
@@ -65,7 +95,7 @@ class BookedServicesPage extends StatelessWidget {
                     children: [
                       Text('Skill: ${request['workerSkill'] ?? 'Unknown Skill'}'),
                       Text('Client: ${request['clientName'] ?? 'Unknown Client'}'),
-                      Text('Contact: ${request['clientContact'] ?? 'Unknown Contact'}'),
+                      Text('Worker Contact: ${request['workerPhone'] ?? 'Unknown Phone'}'), // Display worker phone
                       Text(
                         'Status: ${request['status']}',
                         style: TextStyle(
@@ -93,6 +123,25 @@ class BookedServicesPage extends StatelessWidget {
             },
           );
         },
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.book),
+            label: 'My Bookings',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.account_circle),
+            label: 'Account',
+          ),
+        ],
+        currentIndex: _selectedIndex,
+        selectedItemColor: Colors.blue,
+        onTap: _onItemTapped,
       ),
     );
   }

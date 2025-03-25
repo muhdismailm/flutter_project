@@ -132,14 +132,17 @@ class _LoginFormState extends State<CLogin> {
         if (userCredential.user != null) {
           final userDoc = await _firestore.collection('users').doc(userCredential.user!.uid).get();
           if (userDoc.exists && userDoc['role'] == 'client') {
+            // ignore: use_build_context_synchronously
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text('Logged in successfully')),
             );
             Navigator.pushReplacement(
+              // ignore: use_build_context_synchronously
               context,
               MaterialPageRoute(builder: (context) => const ClientHomePage()),
             );
           } else {
+            // ignore: use_build_context_synchronously
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text('You are not authorized to login as a client')),
             );

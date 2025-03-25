@@ -1,8 +1,38 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:login_1/src/worker/features/screens/pages/HomeScreen.dart';
+import 'package:login_1/src/worker/features/screens/pages/w_navigation.dart' hide HomePage;
 
-class WorkerRequestsPage extends StatelessWidget {
+class WorkerRequestsPage extends StatefulWidget {
   const WorkerRequestsPage({Key? key}) : super(key: key);
+
+  @override
+  State<WorkerRequestsPage> createState() => _WorkerRequestsPageState();
+}
+
+class _WorkerRequestsPageState extends State<WorkerRequestsPage> {
+  int _selectedIndex = 1; // Set "Requests" as the default selected tab
+
+  void _onItemTapped(int index) {
+    if (index == 0) {
+      // Navigate to Home
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const HomePage()),
+      );
+    } else if (index == 1) {
+      // Stay on "Requests"
+    } else if (index == 2) {
+      // Navigate to Account
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const WorkerNavigationDrawer()),
+      );
+    }
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +74,7 @@ class WorkerRequestsPage extends StatelessWidget {
               'workerName': entry.value['workerName'],
               'workerSkill': entry.value['workerSkill'],
               'clientName': entry.value['clientName'],
-              'clientContact': entry.value['clientContact'],
+              'clientPhone': entry.value['clientPhone'], // Use clientPhone instead of clientContact
               'timestamp': entry.value['timestamp'],
               'status': entry.value['status'] ?? 'Pending', // Default to "Pending"
             };
@@ -64,7 +94,7 @@ class WorkerRequestsPage extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text('Skill: ${request['workerSkill'] ?? 'Unknown Skill'}'),
-                      Text('Contact: ${request['clientContact'] ?? 'Unknown Contact'}'),
+                      Text('Contact: ${request['clientPhone'] ?? 'Unknown Phone'}'), // Updated field
                       Text('Timestamp: ${request['timestamp'] ?? 'Unknown Time'}'),
                       Text(
                         'Status: ${request['status']}',
@@ -94,6 +124,25 @@ class WorkerRequestsPage extends StatelessWidget {
           );
         },
       ),
+      bottomNavigationBar: BottomNavigationBar(
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.book),
+            label: 'Requests',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.account_circle),
+            label: 'Account',
+          ),
+        ],
+        currentIndex: _selectedIndex,
+        selectedItemColor: Colors.amber,
+        onTap: _onItemTapped,
+      ),
     );
   }
 
@@ -109,7 +158,7 @@ class WorkerRequestsPage extends StatelessWidget {
             children: [
               Text('Skill: ${request['workerSkill']}'),
               const SizedBox(height: 8),
-              Text('Contact: ${request['clientContact']}'),
+              Text('Contact: ${request['clientPhone']}'), // Updated field
               const SizedBox(height: 8),
               Text('Timestamp: ${request['timestamp']}'),
             ],

@@ -141,9 +141,9 @@ class _ClientHomePageState extends State<ClientHomePage> {
             // Navigation Bar with Welcome Message and Profile Icon
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 42),
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: Colors.blue, // Background color for the navigation bar
-                borderRadius: const BorderRadius.only(
+                borderRadius: BorderRadius.only(
                   bottomLeft: Radius.circular(16),
                   bottomRight: Radius.circular(16),
                 ),
@@ -197,7 +197,7 @@ class _ClientHomePageState extends State<ClientHomePage> {
               child: DropdownButtonFormField<String>(
                 value: selectedSkill,
                 decoration: InputDecoration(
-                  labelText: 'Select Skill',
+                  labelText: 'Select work',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),

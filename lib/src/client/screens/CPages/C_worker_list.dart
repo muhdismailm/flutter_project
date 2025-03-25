@@ -94,7 +94,7 @@ class WorkerList extends StatelessWidget {
                               backgroundColor: Colors.blue,
                               foregroundColor: Colors.white,
                             ),
-                            child: const Text('Request Now'),
+                            child: const Text('View'),
                           ),
                           isThreeLine: true,
                           contentPadding: const EdgeInsets.symmetric(
@@ -157,14 +157,19 @@ class WorkerList extends StatelessWidget {
         String clientName = user.displayName ?? user.email?.split('@')[0] ?? 'Unknown Client';
         String clientContact = user.email ?? 'Unknown Contact';
 
+        // Fetch worker phone number from Firestore
+        String workerPhone = workerData['phone'] ?? 'Unknown Phone';
+
         // Store request in Realtime Database
         DatabaseReference requestRef = FirebaseDatabase.instance.ref('requests').push();
         await requestRef.set({
           'workerName': workerData['name'],
           'workerSkill': workerData['skill'],
+          'workerPhone': workerPhone, // Add worker phone number
           'clientName': clientName,
           'clientContact': clientContact,
           'timestamp': DateTime.now().toIso8601String(),
+          'status': 'Pending', // Default status
         });
 
         ScaffoldMessenger.of(context).showSnackBar(
@@ -177,5 +182,32 @@ class WorkerList extends StatelessWidget {
         const SnackBar(content: Text('Failed to send request. Please try again.')),
       );
     }
+  }
+}
+
+Future<void> createRequest({
+  required String workerName,
+  required String workerSkill,
+  required String clientName,
+  required String clientPhone,
+  required String clientEmail,
+}) async {
+  try {
+    final DatabaseReference ref = FirebaseDatabase.instance.ref('requests');
+
+    // Push a new request to the 'requests' node
+    await ref.push().set({
+      'workerName': workerName,
+      'workerSkill': workerSkill,
+      'clientName': clientName,
+      'clientPhone': clientPhone, // Add client phone number
+      'clientEmail': clientEmail, // Add client email
+      'timestamp': DateTime.now().toIso8601String(),
+      'status': 'Pending', // Default status
+    });
+
+    print('Request created successfully.');
+  } catch (e) {
+    print('Error creating request: $e');
   }
 }
