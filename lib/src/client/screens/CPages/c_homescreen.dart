@@ -191,31 +191,83 @@ class _ClientHomePageState extends State<ClientHomePage> {
             ),
             const SizedBox(height: 16),
 
-            // Dropdown for selecting skill
+            // Grid of categories
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: DropdownButtonFormField<String>(
-                value: selectedSkill,
-                decoration: InputDecoration(
-                  labelText: 'Select work',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Select Work',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
-                items: skills.map((String skill) {
-                  return DropdownMenuItem<String>(
-                    value: skill,
-                    child: Text(skill),
-                  );
-                }).toList(),
-                onChanged: (String? newValue) {
-                  setState(() {
-                    selectedSkill = newValue;
-                  });
-                  if (newValue != null) {
-                    _fetchWorkers(newValue); // Fetch workers for the selected skill
-                  }
-                },
+                  const SizedBox(height: 16),
+
+                  // Dropdown for selecting work
+                  DropdownButtonFormField<String>(
+                    value: selectedSkill,
+                    decoration: InputDecoration(
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    hint: const Text('Select Work'),
+                    items: skills.map((skill) {
+                      return DropdownMenuItem<String>(
+                        value: skill,
+                        child: Text(skill),
+                      );
+                    }).toList(),
+                    onChanged: (value) {
+                      setState(() {
+                        selectedSkill = value;
+                      });
+                      if (value != null) {
+                        _fetchWorkers(value); // Fetch workers for the selected skill
+                      }
+                    },
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Grid of categories
+                  GridView.count(
+                    shrinkWrap: true,
+                    crossAxisCount: 2, // Two icons per row
+                    crossAxisSpacing: 15,
+                    mainAxisSpacing: 15,
+                    childAspectRatio: 1.5, // Adjust the aspect ratio for better layout
+                    children: [
+                      _buildCategoryCard(
+                        context,
+                        icon: Icons.electrical_services,
+                        label: 'Electrician',
+                        skill: 'Electrician',
+                      ),
+                      _buildCategoryCard(
+                        context,
+                        icon: Icons.handyman,
+                        label: 'Carpenter',
+                        skill: 'Carpenter',
+                      ),
+                      _buildCategoryCard(
+                        context,
+                        icon: Icons.format_paint,
+                        label: 'Painter',
+                        skill: 'Painter',
+                      ),
+                      _buildCategoryCard(
+                        context,
+                        icon: Icons.plumbing,
+                        label: 'Plumber',
+                        skill: 'Plumber',
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
             const SizedBox(height: 16),
@@ -297,6 +349,37 @@ class _ClientHomePageState extends State<ClientHomePage> {
           ],
         );
       },
+    );
+  }
+
+  // Method to build category card
+  Widget _buildCategoryCard(BuildContext context, {required IconData icon, required String label, required String skill}) {
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          selectedSkill = skill;
+        });
+        _fetchWorkers(skill);
+      },
+      child: Card(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, size: 48, color: Colors.blue),
+            const SizedBox(height: 8),
+            Text(
+              label,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

@@ -15,7 +15,7 @@ class WAppbar extends StatelessWidget implements PreferredSizeWidget {
           fontWeight: FontWeight.bold,
         ),
       ),
-      leading: const Icon(Icons.work_rounded),
+      leading: const Icon(Icons.work_outline_rounded,color: Colors.white,),
     );
   }
 

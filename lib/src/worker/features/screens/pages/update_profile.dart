@@ -84,7 +84,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Update Profile'),
+        title: const Text('Update Profile', style: TextStyle(color: Colors.white)),
         backgroundColor: Colors.amber,
       ),
       body: Padding(

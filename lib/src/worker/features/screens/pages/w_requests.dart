@@ -41,7 +41,9 @@ class _WorkerRequestsPageState extends State<WorkerRequestsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Client Requests'),
+        title: const Text('Client Requests'
+        ,style: TextStyle(color: Colors.white),
+        ),
         backgroundColor: Colors.amber,
       ),
       body: StreamBuilder<DatabaseEvent>(
@@ -104,7 +106,7 @@ class _WorkerRequestsPageState extends State<WorkerRequestsPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text('Skill: ${request['workerSkill'] ?? 'Unknown Skill'}'),
-                      Text('Contact: ${request['clientPhone'] ?? 'Unknown Phone'}'), // Updated field
+                      // Text('Contact: ${request['clientPhone'] ?? 'Unknown Phone'}'), // Updated field
                       Text('Timestamp: ${request['timestamp'] ?? 'Unknown Time'}'),
                       Text(
                         'Status: ${request['status']}',

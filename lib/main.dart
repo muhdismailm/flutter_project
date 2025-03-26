@@ -35,6 +35,7 @@ class WelcomeScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.blue,
+        toolbarHeight: 80,
         title: const Text(
           "WORKIFY",
           style: TextStyle(
@@ -42,7 +43,7 @@ class WelcomeScreen extends StatelessWidget {
             fontWeight: FontWeight.bold,
           ),
         ),
-        leading: const Icon(Icons.work_rounded),
+        leading: const Icon(Icons.work_outline,color: Colors.white,),
       ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
