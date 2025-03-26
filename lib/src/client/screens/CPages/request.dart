@@ -132,7 +132,7 @@ class _BookedServicesPageState extends State<BookedServicesPage> {
                                 backgroundColor: Colors.green,
                                 foregroundColor: Colors.white,
                               ),
-                              child: const Text('Rate'),
+                              child: const Text('Rating'),
                             ),
                             ElevatedButton(
                               onPressed: () {

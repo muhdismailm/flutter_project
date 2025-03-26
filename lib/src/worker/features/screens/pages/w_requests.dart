@@ -6,7 +6,7 @@ import 'package:login_1/src/worker/features/screens/pages/HomeScreen.dart';
 import 'package:login_1/src/worker/features/screens/pages/w_navigation.dart' hide HomePage;
 
 class WorkerRequestsPage extends StatefulWidget {
-  const WorkerRequestsPage({Key? key, required this.workerSkill, required this.workerName}) : super(key: key);
+  const WorkerRequestsPage({super.key, required this.workerSkill, required this.workerName});
 final String workerSkill;
 final String workerName;
   @override
@@ -182,7 +182,9 @@ class _WorkerRequestsPageState extends State<WorkerRequestsPage> {
                 await FirebaseDatabase.instance
                     .ref('requests/${request['key']}')
                     .remove();
+                // ignore: use_build_context_synchronously
                 Navigator.of(context).pop(); // Close the dialog
+                // ignore: use_build_context_synchronously
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Request rejected.')),
                 );

@@ -63,7 +63,7 @@ class _HomePageState extends State<HomePage> {
       // Requests
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) =>  WorkerRequestsPage(workerName: widget.name,workerSkill: widget.skill,)),
+        MaterialPageRoute(builder: (context) =>  WorkerRequestsPage(workerName: '', workerSkill: '',)),
       );
     } else if (index == 2) {
       // Account
