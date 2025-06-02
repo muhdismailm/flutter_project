@@ -2,7 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'w_login.dart'; // Import the login form
+import 'dart:math'; // for generating random digits
+import 'w_login.dart'; // Login form
 import 'package:login_1/src/worker/features/screens/widgets/w_appbar.dart';
 
 class WSignUpForm extends StatefulWidget {
@@ -147,8 +148,8 @@ class _SignUpFormState extends State<WSignUpForm> {
                 child: ElevatedButton(
                   onPressed: _signup,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.amberAccent, // Background color
-                    foregroundColor: Colors.white, // Text color
+                    backgroundColor: Colors.amberAccent,
+                    foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 20),
                     textStyle: const TextStyle(fontSize: 16),
                     shape: RoundedRectangleBorder(
@@ -165,41 +166,58 @@ class _SignUpFormState extends State<WSignUpForm> {
     );
   }
 
+  /// Generate a 5-character custom UID using first 3 letters of name + 2 random digits
+  String _generateCustomUid(String name) {
+    String prefix = name.trim().toUpperCase().replaceAll(" ", "");
+    if (prefix.length >= 3) {
+      prefix = prefix.substring(0, 3);
+    } else {
+      prefix = prefix.padRight(3, 'X'); // fallback if name < 3 letters
+    }
+    final rand = Random();
+    final digits = rand.nextInt(90) + 10; // Generates a number from 10 to 99
+    return '$prefix$digits';
+  }
+
   void _signup() async {
     if (_formKey.currentState!.validate()) {
-      final email = _emailController.text;
+      final email = _emailController.text.trim();
       final password = _passwordController.text;
-      final confirmPassword = _confirmPasswordController.text;
+      final name = _nameController.text.trim();
 
-      if (password == confirmPassword) {
-        try {
-          final userCredential = await _auth.createUserWithEmailAndPassword(
-            email: email,
-            password: password,
-          );
-          if (userCredential.user != null) {
-            await FirebaseFirestore.instance.collection('worker').doc(userCredential.user!.uid).set({
-              'name': _nameController.text,
-              'email': _emailController.text,
-              'phone': _phoneController.text,
-              'role': 'worker', // Add the role field
-            });
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('User created successfully')),
-            );
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => const WLogin()),
-            );
-          }
-        } catch (e) {
+      try {
+        final userCredential = await _auth.createUserWithEmailAndPassword(
+          email: email,
+          password: password,
+        );
+
+        final user = userCredential.user;
+
+        if (user != null) {
+          final customUid = _generateCustomUid(name);
+
+          await FirebaseFirestore.instance.collection('worker').doc(customUid).set({
+            'customUid': customUid,
+            'name': name,
+            'email': email,
+            'phone': _phoneController.text.trim(),
+            'role': 'worker',
+            'authUid': user.uid,
+            'createdAt': FieldValue.serverTimestamp(),
+          });
+
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('User creation failed: $e')),
+            const SnackBar(content: Text('Worker registered successfully')),
+          );
+
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const WLogin()),
           );
         }
-      } else {
+      } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Passwords do not match')),
+          SnackBar(content: Text('Registration failed: $e')),
         );
       }
     }
