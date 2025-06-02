@@ -1,8 +1,9 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'c_login.dart'; // Import the login form
+import 'c_login.dart';
 
 class CSignUpForm extends StatefulWidget {
   const CSignUpForm({Key? key}) : super(key: key);
@@ -32,139 +33,21 @@ class _SignUpFormState extends State<CSignUpForm> {
     super.dispose();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Client Sign Up'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Form(
-          key: _formKey,
-          child: ListView(
-            children: [
-              TextFormField(
-                controller: _nameController,
-                decoration: InputDecoration(
-                  labelText: 'Name',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                  filled: true,
-                  fillColor: Colors.grey[200],
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your name';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 20),
-              TextFormField(
-                controller: _emailController,
-                decoration: InputDecoration(
-                  labelText: 'Email ID',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                  filled: true,
-                  fillColor: Colors.grey[200],
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your email ID';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 20),
-              TextFormField(
-                controller: _phoneController,
-                decoration: InputDecoration(
-                  labelText: 'Phone Number',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                  filled: true,
-                  fillColor: Colors.grey[200],
-                ),
-                keyboardType: TextInputType.number,
-                inputFormatters: [
-                  FilteringTextInputFormatter.digitsOnly,
-                  LengthLimitingTextInputFormatter(10),
-                ],
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your phone number';
-                  } else if (value.length != 10) {
-                    return 'Phone number must be 10 digits';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 20),
-              TextFormField(
-                controller: _passwordController,
-                decoration: InputDecoration(
-                  labelText: 'Password',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                  filled: true,
-                  fillColor: Colors.grey[200],
-                ),
-                obscureText: true,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your password';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 20),
-              TextFormField(
-                controller: _confirmPasswordController,
-                decoration: InputDecoration(
-                  labelText: 'Confirm Password',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                  filled: true,
-                  fillColor: Colors.grey[200],
-                ),
-                obscureText: true,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please confirm your password';
-                  } else if (value != _passwordController.text) {
-                    return 'Passwords do not match';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 40),
-              Center(
-                child: ElevatedButton(
-                  onPressed: _signup,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue, // Background color
-                    foregroundColor: Colors.white, // Text color
-                    padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 20),
-                    textStyle: const TextStyle(fontSize: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                    ),
-                  ),
-                  child: const Text('Sign Up'),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
+  Future<String> _generateUniqueClientId(String name) async {
+    final random = Random();
+    String idPrefix = name.trim().toUpperCase().substring(0, min(3, name.length));
+    String clientId = '';
+    bool exists = true;
+
+    while (exists) {
+      String randomDigits = (10 + random.nextInt(90)).toString(); // 2-digit number
+      clientId = idPrefix + randomDigits;
+
+      final doc = await _firestore.collection('client').doc(clientId).get();
+      exists = doc.exists;
+    }
+
+    return clientId;
   }
 
   void _signup() async {
@@ -172,6 +55,7 @@ class _SignUpFormState extends State<CSignUpForm> {
       final email = _emailController.text;
       final password = _passwordController.text;
       final confirmPassword = _confirmPasswordController.text;
+      final name = _nameController.text.trim();
 
       if (password == confirmPassword) {
         try {
@@ -179,16 +63,24 @@ class _SignUpFormState extends State<CSignUpForm> {
             email: email,
             password: password,
           );
+
           if (userCredential.user != null) {
-            await _firestore.collection('users').doc(userCredential.user!.uid).set({
-              'name': _nameController.text,
-              'email': _emailController.text,
+            String clientId = await _generateUniqueClientId(name);
+
+            await _firestore.collection('client').doc(clientId).set({
+              'name': name,
+              'email': email,
               'phone': _phoneController.text,
-              'role': 'client', // Add the role field
+              'role': 'client',
+              'clientId': clientId,
+              'uid': userCredential.user!.uid,
+              'createdAt': FieldValue.serverTimestamp(),
             });
+
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('User created successfully')),
+              SnackBar(content: Text('Client created. ID: $clientId')),
             );
+
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (context) => const CLogin()),
@@ -205,5 +97,74 @@ class _SignUpFormState extends State<CSignUpForm> {
         );
       }
     }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Client Sign Up')),
+      body: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Form(
+          key: _formKey,
+          child: ListView(
+            children: [
+              _buildTextField('Name', _nameController),
+              const SizedBox(height: 20),
+              _buildTextField('Email ID', _emailController),
+              const SizedBox(height: 20),
+              _buildTextField('Phone Number', _phoneController, inputType: TextInputType.number, inputFormatters: [
+                FilteringTextInputFormatter.digitsOnly,
+                LengthLimitingTextInputFormatter(10),
+              ]),
+              const SizedBox(height: 20),
+              _buildTextField('Password', _passwordController, obscureText: true),
+              const SizedBox(height: 20),
+              _buildTextField('Confirm Password', _confirmPasswordController, obscureText: true),
+              const SizedBox(height: 40),
+              Center(
+                child: ElevatedButton(
+                  onPressed: _signup,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 20),
+                    textStyle: const TextStyle(fontSize: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                  ),
+                  child: const Text('Sign Up'),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTextField(String label, TextEditingController controller,
+      {bool obscureText = false,
+      TextInputType inputType = TextInputType.text,
+      List<TextInputFormatter>? inputFormatters}) {
+    return TextFormField(
+      controller: controller,
+      obscureText: obscureText,
+      keyboardType: inputType,
+      inputFormatters: inputFormatters,
+      decoration: InputDecoration(
+        labelText: label,
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10.0)),
+        filled: true,
+        fillColor: Colors.grey[200],
+      ),
+      validator: (value) {
+        if (value == null || value.isEmpty) return 'Please enter your $label';
+        if (label == 'Phone Number' && value.length != 10) return 'Phone number must be 10 digits';
+        if (label == 'Confirm Password' && value != _passwordController.text) return 'Passwords do not match';
+        return null;
+      },
+    );
   }
 }
