@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:login_1/src/client/screens/CPages/c_homescreen.dart';
 import 'package:login_1/src/client/screens/login/c_signup.dart';
 import 'package:login_1/src/client/widgets/custom_appbar.dart';
+
 class CLogin extends StatefulWidget {
   const CLogin({Key? key}) : super(key: key);
 
@@ -47,7 +47,7 @@ class _LoginFormState extends State<CLogin> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       const Text(
-                        'Login as client',
+                        'Login as Client',
                         style: TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
@@ -90,8 +90,8 @@ class _LoginFormState extends State<CLogin> {
                       ElevatedButton(
                         onPressed: _login,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blue, // Background color
-                          foregroundColor: Colors.white, // Text color
+                          backgroundColor: Colors.blue,
+                          foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 20),
                           textStyle: const TextStyle(fontSize: 16),
                           shape: RoundedRectangleBorder(
@@ -124,35 +124,68 @@ class _LoginFormState extends State<CLogin> {
   void _login() async {
     if (_formKey.currentState!.validate()) {
       try {
-        final UserCredential userCredential = await _auth.signInWithEmailAndPassword(
-          email: _emailController.text,
-          password: _passwordController.text,
+        final userCredential = await _auth.signInWithEmailAndPassword(
+          email: _emailController.text.trim(),
+          password: _passwordController.text.trim(),
         );
 
-        if (userCredential.user != null) {
-          final userDoc = await _firestore.collection('users').doc(userCredential.user!.uid).get();
-          if (userDoc.exists && userDoc['role'] == 'client') {
-            // ignore: use_build_context_synchronously
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Logged in successfully')),
-            );
-            Navigator.pushReplacement(
-              // ignore: use_build_context_synchronously
-              context,
-              MaterialPageRoute(builder: (context) => const ClientHomePage()),
-            );
+        final user = userCredential.user;
+
+        if (user != null) {
+          // ✅ Step 1: Search client collection for the document with this email
+          final querySnapshot = await _firestore
+              .collection('client')
+              .where('email', isEqualTo: _emailController.text.trim())
+              .limit(1)
+              .get();
+
+          if (querySnapshot.docs.isNotEmpty) {
+            final doc = querySnapshot.docs.first;
+            final data = doc.data();
+            final role = data['role'];
+
+            if (role == 'client') {
+              if (!mounted) return;
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Logged in successfully')),
+              );
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const ClientHomePage()),
+              );
+            } else {
+              await _auth.signOut();
+              if (!mounted) return;
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Unauthorized role: Access denied')),
+              );
+            }
           } else {
-            // ignore: use_build_context_synchronously
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('You are not authorized to login as a client')),
-            );
             await _auth.signOut();
+            if (!mounted) return;
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Client data not found')),
+            );
           }
         }
+      } on FirebaseAuthException catch (e) {
+        String message = 'Login failed';
+        if (e.code == 'user-not-found') {
+          message = 'No user found for that email';
+        } else if (e.code == 'wrong-password') {
+          message = 'Incorrect password';
+        }
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(message)),
+          );
+        }
       } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Login failed: $e')),
-        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Login failed: $e')),
+          );
+        }
       }
     }
   }
